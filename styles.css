@@ -1,0 +1,73 @@
+:root {
+    --primary: #3b82f6;
+    --secondary: #ef4444;
+    --dark: #1e293b;
+    --light: #f8fafc;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cell:hover {
+    transform: scale(1.05);
+}
+
+.x-symbol {
+    color: var(--primary);
+}
+
+.o-symbol {
+    color: var(--secondary);
+}
+
+.winning-cell {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.theme-toggle {
+    transition: transform 0.3s;
+}
+
+.theme-toggle:hover {
+    transform: rotate(30deg);
+}
+
+.timer-bar {
+    transition: width 1s linear;
+}
+
+.modal {
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sound-toggle {
+    transition: all 0.3s;
+}
+
+.sound-toggle:hover {
+    transform: scale(1.1);
+}
