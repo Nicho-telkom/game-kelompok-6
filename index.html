@@ -12,6 +12,11 @@
   <div class="modal" id="nameModal">
     <div class="modal-content">
       <h2>Selamat Datang di Tic Tac Toe</h2>
+  <!-- Halaman Login -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <h2>Selamat Datang di</h2>
+      <h1 class="title">Tic Tac Toe</h1>
       <div class="form-group">
         <label for="player1">Player 1 (X):</label>
         <input type="text" id="player1" placeholder="Masukkan nama" value="Player 1">
@@ -24,38 +29,52 @@
     </div>
   </div>
 
-  <!-- Game Screen -->
-  <div class="screen game-screen" id="gameScreen">
+  <!-- Halaman Game -->
+  <div class="game-screen" id="gameScreen">
     <h1>Tic Tac Toe</h1>
     <div class="turn-indicator">
       Giliran: <strong id="currentPlayer">X</strong>
     </div>
     
     <div class="game-box">
-      <div class="board" id="board">
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-        <div class="cell" data-cell></div>
-      </div>
+      <div class="board-container">
+        <!-- Board -->
+        <div class="board" id="board">
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+          <div class="cell" data-cell></div>
+        </div>
 
-      <div class="leaderboard">
-        <h3>🏆 Leaderboard</h3>
-        <p><span id="player1Name">Player 1</span>: <strong><span id="player1Score">0</span></strong> Menang</p>
-        <p><span id="player2Name">Player 2</span>: <strong><span id="player2Score">0</span></strong> Menang</p>
-        <p>Seri: <strong><span id="draws">0</span></strong></p>
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div class="leaderboard">
+            <h3>🏆 Leaderboard</h3>
+            <p><span id="player1Name">Player 1</span>: <strong><span id="player1Score">0</span></strong> Menang</p>
+            <p><span id="player2Name">Player 2</span>: <strong><span id="player2Score">0</span></strong> Menang</p>
+            <p>Seri: <strong><span id="draws">0</span></strong></p>
+          </div>
+
+          <div id="achievementBox" class="achievement-box">
+            <h3>✨ Achievement</h3>
+            <ul id="achievementList">
+              <li>Belum ada</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
 
     <h2 id="winning-message"></h2>
-    <div id="achievementMessage" class="achievement-message"></div> <!-- Elemen untuk pesan achievement -->
+    <div id="achievementMessage" class="achievement-message"></div>
     <button id="restartButton">Main Lagi</button>
   </div>
-<script src="game.js"></script>
+
+  <script src="game.js"></script>
 </body>
 </html>

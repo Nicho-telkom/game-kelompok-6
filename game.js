@@ -1,5 +1,4 @@
-
-    let currentPlayer = 'X';
+let currentPlayer = 'X';
 let board = ['', '', '', '', '', '', '', '', ''];
 let gameActive = true;
 let player1Name = 'Player 1';
@@ -8,11 +7,10 @@ let player1Score = 0;
 let player2Score = 0;
 let draws = 0;
 
-// Variabel baru untuk Achievement
+// Variabel untuk Achievement
 let player1WinStreak = 0;
 let player2WinStreak = 0;
 let achievements = {
-  firstWin: { player1: false, player2: false, message: "Kemenangan Pertama!" },
   fiveWins: { player1: false, player2: false, message: "5 Kemenangan!" },
   tenWins: { player1: false, player2: false, message: "10 Kemenangan!" },
   firstDraw: { achieved: false, message: "Seri Pertama!" },
@@ -31,7 +29,7 @@ const currentPlayerDisplay = document.getElementById('currentPlayer');
 const winningMessage = document.getElementById('winning-message');
 const restartButton = document.getElementById('restartButton');
 const startButton = document.getElementById('startButton');
-const nameModal = document.getElementById('nameModal');
+const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
 
 startButton.addEventListener('click', () => {
@@ -41,7 +39,7 @@ startButton.addEventListener('click', () => {
   document.getElementById('player1Name').textContent = player1Name;
   document.getElementById('player2Name').textContent = player2Name;
   
-  nameModal.style.display = 'none';
+  loginScreen.style.display = 'none';
   gameScreen.style.display = 'flex';
   
   initializeGame();
@@ -55,7 +53,6 @@ function initializeGame() {
   restartButton.addEventListener('click', restartGame);
   updateDisplay();
 
-  // Tampilkan achievement awal
   showAchievement({
     player1: player1Score,
     player2: player2Score,
@@ -92,12 +89,12 @@ function checkResult() {
     winningMessage.textContent = `🎉 ${winner} Menang!`;
     
     if (currentPlayer === 'X') {
-      player1Score += 5; // ✅ Tambah 5 poin
+      player1Score += 1;
       document.getElementById('player1Score').textContent = player1Score;
       player1WinStreak++;
       player2WinStreak = 0;
     } else {
-      player2Score += 5; // ✅ Tambah 5 poin
+      player2Score += 1;
       document.getElementById('player2Score').textContent = player2Score;
       player2WinStreak++;
       player1WinStreak = 0;
@@ -108,14 +105,7 @@ function checkResult() {
     });
 
     checkAchievements();
-
-    // 🔥 Update Achievement box
-    showAchievement({
-      player1: player1Score,
-      player2: player2Score,
-      seri: draws
-    });
-
+    showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
     return;
   }
 
@@ -127,14 +117,7 @@ function checkResult() {
     player1WinStreak = 0;
     player2WinStreak = 0;
     checkAchievements();
-
-    // 🔥 Update Achievement box
-    showAchievement({
-      player1: player1Score,
-      player2: player2Score,
-      seri: draws
-    });
-
+    showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
     return;
   }
 
@@ -163,16 +146,9 @@ function restartGame() {
   });
   
   updateDisplay();
-
-  // 🔥 Update Achievement box saat restart
-  showAchievement({
-    player1: player1Score,
-    player2: player2Score,
-    seri: draws
-  });
+  showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
 }
 
-// Fungsi untuk memeriksa dan menampilkan achievement
 function checkAchievements() {
   if (player1Score >= 5 && !achievements.fiveWins.player1) {
     achievements.fiveWins.player1 = true;
@@ -206,7 +182,7 @@ function checkAchievements() {
     displayAchievement(player2Name, achievements.threeWinStreak.message);
   }
 
-  if (player1WinStreak === 5 && !achievements.fiveWinStreak.player1) {
+    if (player1WinStreak === 5 && !achievements.fiveWinStreak.player1) {
     achievements.fiveWinStreak.player1 = true;
     displayAchievement(player1Name, achievements.fiveWinStreak.message);
   }
@@ -225,7 +201,7 @@ function displayAchievement(playerName, message) {
   }, 3000);
 }
 
-// Function untuk buat elemen achievement dan update isinya
+// ✅ Update isi Achievement Box di sidebar
 function showAchievement(score) {
   const existing = document.querySelector('.achievement');
   if (existing) {
@@ -245,4 +221,12 @@ function showAchievement(score) {
   `;
 
   document.body.appendChild(achievement);
+}
+{
+  const achievementList = document.getElementById('achievementList');
+  achievementList.innerHTML = `
+    <p>${player1Name}: <strong>${score.player1}</strong> poin</p>
+    <p>${player2Name}: <strong>${score.player2}</strong> poin</p>
+    <p>Seri: <strong>${score.seri}</strong></p>
+  `;
 }
