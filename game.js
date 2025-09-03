@@ -233,7 +233,7 @@ function showAchievement(score) {
   }
 
   const achievement = document.createElement('div');
-  achievement.className = 'achievement';
+  achievement.className = 'Achievement';
 
   achievement.innerHTML = `
     <h3>🏆 Achievement</h3>
