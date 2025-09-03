@@ -4,26 +4,57 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="game-container">
-    <h1>Tic Tac Toe</h1>
-    <div class="board" id="board">
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
-      <div class="cell" data-cell></div>
+  <!-- Modal Input Nama -->
+  <div class="modal" id="nameModal">
+    <div class="modal-content">
+      <h2>Selamat Datang di Tic Tac Toe!</h2>
+      <div class="form-group">
+        <label for="player1">Player 1 (X):</label>
+        <input type="text" id="player1" placeholder="Masukkan nama" value="Player 1">
+      </div>
+      <div class="form-group">
+        <label for="player2">Player 2 (O):</label>
+        <input type="text" id="player2" placeholder="Masukkan nama" value="Player 2">
+      </div>
+      <button id="startButton">Mulai Permainan</button>
     </div>
-    <h2 id="winning-message"></h2>
-    <button id="restartButton">Restart Game</button>
   </div>
 
-  <script src="game.js"></script>
+  <!-- Game Screen -->
+  <div class="screen game-screen" id="gameScreen">
+    <h1>Tic Tac Toe</h1>
+    <div class="turn-indicator">
+      Giliran: <strong id="currentPlayer">X</strong>
+    </div>
+    
+    <div class="game-box">
+      <div class="board" id="board">
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+      </div>
+
+      <div class="leaderboard">
+        <h3>🏆 Leaderboard</h3>
+        <p><span id="player1Name">Player 1</span>: <strong><span id="player1Score">0</span></strong> Menang</p>
+        <p><span id="player2Name">Player 2</span>: <strong><span id="player2Score">0</span></strong> Menang</p>
+        <p>Seri: <strong><span id="draws">0</span></strong></p>
+      </div>
+    </div>
+
+    <h2 id="winning-message"></h2>
+    <button id="restartButton">Main Lagi</button>
+  </div>
+<script src="game.js"></script>
 </body>
 </html>
