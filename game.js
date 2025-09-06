@@ -32,32 +32,73 @@ const startButton = document.getElementById('startButton');
 const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
 
-startButton.addEventListener('click', () => {
-  player1Name = document.getElementById('player1').value || 'Player 1';
-  player2Name = document.getElementById('player2').value || 'Player 2';
-  
+// 🔹 Tambahan Modal Mode + Toggle Tema
+const modeModal = document.getElementById('modeModal');
+
+// Saat pertama kali load → buka modal mode
+window.onload = () => {
+  modeModal.style.display = 'flex';
+  loginScreen.style.display = 'none'; 
+  gameScreen.style.display = 'none';
+};
+
+// Pilih mode Player vs Player
+document.getElementById('playWithPlayer').addEventListener('click', () => {
+  modeModal.style.display = 'none';
+  loginScreen.style.display = 'flex';
+});
+
+// Pilih mode vs Bot
+document.getElementById('playWithBot').addEventListener('click', () => {
+  modeModal.style.display = 'none';
+  player2Name = 'Bot';
   document.getElementById('player1Name').textContent = player1Name;
   document.getElementById('player2Name').textContent = player2Name;
-  
   loginScreen.style.display = 'none';
   gameScreen.style.display = 'flex';
-  
+  initializeGame();
+})
+// Toggle Tema
+document.getElementById('toggleTheme').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  if (document.body.classList.contains('dark')) {
+    localStorage.setItem('theme', 'dark');
+  } else {
+    localStorage.setItem('theme', 'light');
+  }
+});
+
+// Terapkan tema saat load
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark');
+}
+
+// Start game
+startButton.addEventListener('click', () => {
+  player1Name = document.getElementById('player1').value || 'Player 1';
+  if (player2Name !== "Bot") {
+    player2Name = document.getElementById('player2').value || 'Player 2';
+  }
+
+  document.getElementById('player1Name').textContent = player1Name;
+  document.getElementById('player2Name').textContent = player2Name;
+
+  loginScreen.style.display = 'none';
+  gameScreen.style.display = 'flex';
   initializeGame();
 });
 
 function initializeGame() {
   cells.forEach(cell => {
+    cell.textContent = '';
+    cell.classList.remove('winning');
+    cell.removeEventListener('click', handleCellClick);
     cell.addEventListener('click', handleCellClick, { once: true });
   });
-  
+
   restartButton.addEventListener('click', restartGame);
   updateDisplay();
-
-  showAchievement({
-    player1: player1Score,
-    player2: player2Score,
-    seri: draws
-  });
+  showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
 }
 
 function handleCellClick(e) {
@@ -87,14 +128,14 @@ function checkResult() {
     gameActive = false;
     const winner = currentPlayer === 'X' ? player1Name : player2Name;
     winningMessage.textContent = `🎉 ${winner} Menang!`;
-    
+
     if (currentPlayer === 'X') {
-      player1Score += 1;
+      player1Score++;
       document.getElementById('player1Score').textContent = player1Score;
       player1WinStreak++;
       player2WinStreak = 0;
     } else {
-      player2Score += 1;
+      player2Score++;
       document.getElementById('player2Score').textContent = player2Score;
       player2WinStreak++;
       player1WinStreak = 0;
@@ -121,8 +162,28 @@ function checkResult() {
     return;
   }
 
+  // Ganti giliran
   currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
   updateDisplay();
+
+  // Jika vs Bot → giliran Bot
+  if (player2Name === "Bot" && gameActive && currentPlayer === "O") {
+    setTimeout(botMove, 500);
+  }
+}
+
+function botMove() {
+  let emptyCells = [...cells].filter((c, i) => board[i] === '');
+  if (emptyCells.length === 0) return;
+
+  let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  let index = Array.from(cells).indexOf(randomCell);
+
+  board[index] = currentPlayer;
+  randomCell.textContent = currentPlayer;
+  randomCell.removeEventListener('click', handleCellClick);
+
+  checkResult();
 }
 
 function updateDisplay() {
@@ -137,16 +198,8 @@ function restartGame() {
   winningMessage.textContent = '';
   player1WinStreak = 0;
   player2WinStreak = 0;
-  
-  cells.forEach(cell => {
-    cell.textContent = '';
-    cell.classList.remove('winning');
-    cell.removeEventListener('click', handleCellClick);
-    cell.addEventListener('click', handleCellClick, { once: true });
-  });
-  
-  updateDisplay();
-  showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
+
+  initializeGame();
 }
 
 function checkAchievements() {
@@ -182,7 +235,7 @@ function checkAchievements() {
     displayAchievement(player2Name, achievements.threeWinStreak.message);
   }
 
-    if (player1WinStreak === 5 && !achievements.fiveWinStreak.player1) {
+  if (player1WinStreak === 5 && !achievements.fiveWinStreak.player1) {
     achievements.fiveWinStreak.player1 = true;
     displayAchievement(player1Name, achievements.fiveWinStreak.message);
   }
@@ -201,32 +254,44 @@ function displayAchievement(playerName, message) {
   }, 3000);
 }
 
-// ✅ Update isi Achievement Box di sidebar
+// Update isi Achievement Box di sidebar
 function showAchievement(score) {
-  const existing = document.querySelector('.achievement');
-  if (existing) {
-    existing.remove();
-  }
-
-  const achievement = document.createElement('div');
-  achievement.className = 'Achievement';
-
-  achievement.innerHTML = `
-    <h3>🏆 Achievement</h3>
-    <ul>
-      <li>Player 1: <strong>${score.player1}</strong> poin</li>
-      <li>Player 2: <strong>${score.player2}</strong> poin</li>
-      <li>Seri: <strong>${score.seri}</strong></li>
-    </ul>
-  `;
-
-  document.body.appendChild(achievement);
-}
-{
   const achievementList = document.getElementById('achievementList');
   achievementList.innerHTML = `
-    <p>${player1Name}: <strong>${score.player1}</strong> poin</p>
-    <p>${player2Name}: <strong>${score.player2}</strong> poin</p>
-    <p>Seri: <strong>${score.seri}</strong></p>
+    <li>${player1Name}: <strong>${score.player1}</strong> poin</li>
+    <li>${player2Name}: <strong>${score.player2}</strong> poin</li>
+    <li>Seri: <strong>${score.seri}</strong></li>
   `;
 }
+const welcomePopup = document.getElementById('welcomePopup');
+welcomePopup.addEventListener('animationstart', (e) => {
+  if (e.animationName === 'slideDown') {
+    welcomePopup.style.display = 'flex';
+    modeModal.style.display = 'none';
+  }
+});
+// Saat animasi selesai → tampilkan modal mode
+welcomePopup.addEventListener('animationend', (e) => {
+  if (e.animationName === 'slideUp') {
+    welcomePopup.style.display = 'none';
+    modeModal.style.display = 'flex';
+  }
+});
+const backButton = document.getElementById('backButton');
+
+backButton.addEventListener('click', () => {
+  // Reset game
+  board = ['', '', '', '', '', '', '', '', ''];
+  gameActive = true;
+  currentPlayer = 'X';
+  winningMessage.textContent = '';
+
+  cells.forEach(cell => {
+    cell.textContent = '';
+    cell.classList.remove('winning');
+  });
+
+  // Sembunyikan game screen, tampilkan kembali form mode
+  gameScreen.style.display = 'none';
+  document.getElementById('modeModal').style.display = 'flex';
+});

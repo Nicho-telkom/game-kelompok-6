@@ -9,13 +9,24 @@
 </head>
 <body>
   <!-- Modal Input Nama -->
-  <div class="modal" id="nameModal">
-    <div class="modal-content">
-      <h2>Selamat Datang di Tic Tac Toe</h2>
+  <div id="welcomePopup" class="welcome-popup">
+    <div>
+      <h2>👋 Selamat Datang di Tic Tac Toe</h2>
+    </div>
+</div>
+  <!-- Modal Pilihan Mode -->
+<div id="modeModal" class="modal">
+  <div class="modal-content">
+    <h2>Pilih Mode Permainan</h2>
+    <button id="playWithPlayer">👥 Player vs Player</button>
+    <button id="playWithBot">🤖 Player vs Bot</button>
+    <button id="toggleTheme">🌙 Ganti Tema</button>
+  </div>
+</div>
   <!-- Halaman Login -->
   <div class="login-screen" id="loginScreen">
     <div class="login-box">
-      <h2>Selamat Datang di</h2>
+      <h2>Player VS Player</h2>
       <h1 class="title">Tic Tac Toe</h1>
       <div class="form-group">
         <label for="player1">Player 1 (X):</label>
@@ -32,6 +43,7 @@
   <!-- Halaman Game -->
   <div class="game-screen" id="gameScreen">
     <h1>Tic Tac Toe</h1>
+    <button id="backButton" class="back-btn">⬅ Kembali</button>
     <div class="turn-indicator">
       Giliran: <strong id="currentPlayer">X</strong>
     </div>
