@@ -49,15 +49,32 @@ document.getElementById('playWithPlayer').addEventListener('click', () => {
 });
 
 // Pilih mode vs Bot
-document.getElementById('playWithBot').addEventListener('click', () => {
-  modeModal.style.display = 'none';
-  player2Name = 'Bot';
-  document.getElementById('player1Name').textContent = player1Name;
-  document.getElementById('player2Name').textContent = player2Name;
-  loginScreen.style.display = 'none';
-  gameScreen.style.display = 'flex';
-  initializeGame();
-})
+let botDifficulty = 'easy'; // default
+
+const difficultyOptions = document.getElementById('difficultyOptions');
+const playWithBotBtn = document.getElementById('playWithBot');
+const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+// Tampilkan pilihan difficulty saat klik Player vs Bot
+playWithBotBtn.addEventListener('click', () => {
+  difficultyOptions.style.display = 'block';
+});
+
+// Pilih difficulty dan mulai game vs Bot
+difficultyBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    botDifficulty = btn.getAttribute('data-difficulty');
+    modeModal.style.display = 'none';
+    player2Name = 'Bot';
+    document.getElementById('player1Name').textContent = player1Name;
+    document.getElementById('player2Name').textContent = player2Name;
+    loginScreen.style.display = 'none';
+    gameScreen.style.display = 'flex';
+    difficultyOptions.style.display = 'none';
+    initializeGame();
+  });
+});
+
 // Toggle Tema
 document.getElementById('toggleTheme').addEventListener('click', () => {
   document.body.classList.toggle('dark');
@@ -173,17 +190,104 @@ function checkResult() {
 }
 
 function botMove() {
-  let emptyCells = [...cells].filter((c, i) => board[i] === '');
-  if (emptyCells.length === 0) return;
+  let index;
+  if (botDifficulty === 'easy') {
+    // Random move
+    let emptyCells = [...cells].filter((c, i) => board[i] === '');
+    if (emptyCells.length === 0) return;
+    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    index = Array.from(cells).indexOf(randomCell);
+  } else if (botDifficulty === 'medium') {
+    // Coba menang, jika tidak random
+    index = getWinningMove('O');
+    if (index === -1) index = getWinningMove('X');
+    if (index === -1) {
+      let emptyCells = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+      index = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    }
+  } else if (botDifficulty === 'hard') {
+    // Minimax
+    index = getBestMove();
+  }
 
-  let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-  let index = Array.from(cells).indexOf(randomCell);
-
+  if (index === undefined || board[index] !== '') return;
   board[index] = currentPlayer;
-  randomCell.textContent = currentPlayer;
-  randomCell.removeEventListener('click', handleCellClick);
+  cells[index].textContent = currentPlayer;
+  cells[index].removeEventListener('click', handleCellClick);
 
   checkResult();
+}
+
+// Cari langkah menang/tahan
+function getWinningMove(player) {
+  for (let [a, b, c] of winConditions) {
+    let values = [board[a], board[b], board[c]];
+    if (values.filter(v => v === player).length === 2 && values.includes('')) {
+      return [a, b, c].find(i => board[i] === '');
+    }
+  }
+  return -1;
+}
+
+// Minimax untuk hard mode
+function getBestMove() {
+  let bestScore = -Infinity;
+  let move;
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === '') {
+      board[i] = 'O';
+      let score = minimax(board, 0, false);
+      board[i] = '';
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
+  return move;
+}
+
+function minimax(newBoard, depth, isMaximizing) {
+  let result = checkWinnerForMinimax(newBoard);
+  if (result !== null) {
+    if (result === 'O') return 10 - depth;
+    else if (result === 'X') return depth - 10;
+    else return 0;
+  }
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < newBoard.length; i++) {
+      if (newBoard[i] === '') {
+        newBoard[i] = 'O';
+        let score = minimax(newBoard, depth + 1, false);
+        newBoard[i] = '';
+        bestScore = Math.max(score, bestScore);
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < newBoard.length; i++) {
+      if (newBoard[i] === '') {
+        newBoard[i] = 'X';
+        let score = minimax(newBoard, depth + 1, true);
+        newBoard[i] = '';
+        bestScore = Math.min(score, bestScore);
+      }
+    }
+    return bestScore;
+  }
+}
+
+function checkWinnerForMinimax(bd) {
+  for (let [a, b, c] of winConditions) {
+    if (bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) {
+      return bd[a];
+    }
+  }
+  if (!bd.includes('')) return 'draw';
+  return null;
 }
 
 function updateDisplay() {
