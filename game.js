@@ -143,6 +143,7 @@ function checkResult() {
 
   if (roundWon) {
     gameActive = false;
+    clearInterval(timerInterval);
     const winner = currentPlayer === 'X' ? player1Name : player2Name;
     winningMessage.textContent = `🎉 ${winner} Menang!`;
 
@@ -169,6 +170,7 @@ function checkResult() {
 
   if (!board.includes('')) {
     gameActive = false;
+    clearInterval(timerInterval);
     winningMessage.textContent = '🤝 Permainan Seri!';
     draws++;
     document.getElementById('draws').textContent = draws;
@@ -293,8 +295,29 @@ function checkWinnerForMinimax(bd) {
 function updateDisplay() {
   const playerName = currentPlayer === 'X' ? player1Name : player2Name;
   currentPlayerDisplay.textContent = `${playerName} (${currentPlayer})`;
+  startTurnTimer();
 }
 
+// Mulai timer setiap giliran
+let timerInterval;
+let timerDuration = 10;
+const timerCount = document.getElementById('timerCount');
+
+function startTurnTimer() {
+  clearInterval(timerInterval);
+  let timeLeft = timerDuration;
+  timerCount.textContent = timeLeft;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerCount.textContent = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+// Reset timer saat restart game
 function restartGame() {
   currentPlayer = 'X';
   board = ['', '', '', '', '', '', '', '', ''];
@@ -302,61 +325,44 @@ function restartGame() {
   winningMessage.textContent = '';
   player1WinStreak = 0;
   player2WinStreak = 0;
-
+  clearInterval(timerInterval);
+  timerCount.textContent = timerDuration;
   initializeGame();
 }
 
-function checkAchievements() {
-  if (player1Score >= 5 && !achievements.fiveWins.player1) {
-    achievements.fiveWins.player1 = true;
-    displayAchievement(player1Name, achievements.fiveWins.message);
-  }
-  if (player2Score >= 5 && !achievements.fiveWins.player2) {
-    achievements.fiveWins.player2 = true;
-    displayAchievement(player2Name, achievements.fiveWins.message);
-  }
-
-  if (player1Score >= 10 && !achievements.tenWins.player1) {
-    achievements.tenWins.player1 = true;
-    displayAchievement(player1Name, achievements.tenWins.message);
-  }
-  if (player2Score >= 10 && !achievements.tenWins.player2) {
-    achievements.tenWins.player2 = true;
-    displayAchievement(player2Name, achievements.tenWins.message);
-  }
-
-  if (draws === 1 && !achievements.firstDraw.achieved) {
-    achievements.firstDraw.achieved = true;
-    displayAchievement("Semua Pemain", achievements.firstDraw.message);
-  }
-
-  if (player1WinStreak === 3 && !achievements.threeWinStreak.player1) {
-    achievements.threeWinStreak.player1 = true;
-    displayAchievement(player1Name, achievements.threeWinStreak.message);
-  }
-  if (player2WinStreak === 3 && !achievements.threeWinStreak.player2) {
-    achievements.threeWinStreak.player2 = true;
-    displayAchievement(player2Name, achievements.threeWinStreak.message);
-  }
-
-  if (player1WinStreak === 5 && !achievements.fiveWinStreak.player1) {
-    achievements.fiveWinStreak.player1 = true;
-    displayAchievement(player1Name, achievements.fiveWinStreak.message);
-  }
-  if (player2WinStreak === 5 && !achievements.fiveWinStreak.player2) {
-    achievements.fiveWinStreak.player2 = true;
-    displayAchievement(player2Name, achievements.fiveWinStreak.message);
+// Timer timeout: otomatis pindah giliran
+function handleTimeout() {
+  if (!gameActive) return;
+  // Jika cell belum diisi, langsung pindah giliran
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  updateDisplay();
+  startTurnTimer();
+  // Jika vs Bot dan giliran Bot, langsung botMove
+  if (player2Name === "Bot" && gameActive && currentPlayer === "O") {
+    setTimeout(botMove, 500);
   }
 }
 
-function displayAchievement(playerName, message) {
-  const achievementMessage = document.getElementById('achievementMessage');
-  achievementMessage.textContent = `🏆 Achievement Baru! ${playerName}: ${message}`;
-  achievementMessage.classList.add('show');
-  setTimeout(() => {
-    achievementMessage.classList.remove('show');
-  }, 3000);
-}
+// Stop timer saat kembali ke menu
+const backButton = document.getElementById('backButton');
+
+backButton.addEventListener('click', () => {
+  clearInterval(timerInterval);
+  // Reset game
+  board = ['', '', '', '', '', '', '', '', ''];
+  gameActive = true;
+  currentPlayer = 'X';
+  winningMessage.textContent = '';
+
+  cells.forEach(cell => {
+    cell.textContent = '';
+    cell.classList.remove('winning');
+  });
+
+  // Sembunyikan game screen, tampilkan kembali form mode
+  gameScreen.style.display = 'none';
+  document.getElementById('modeModal').style.display = 'flex';
+});
 
 // Update isi Achievement Box di sidebar
 function showAchievement(score) {
@@ -380,22 +386,4 @@ welcomePopup.addEventListener('animationend', (e) => {
     welcomePopup.style.display = 'none';
     modeModal.style.display = 'flex';
   }
-});
-const backButton = document.getElementById('backButton');
-
-backButton.addEventListener('click', () => {
-  // Reset game
-  board = ['', '', '', '', '', '', '', '', ''];
-  gameActive = true;
-  currentPlayer = 'X';
-  winningMessage.textContent = '';
-
-  cells.forEach(cell => {
-    cell.textContent = '';
-    cell.classList.remove('winning');
-  });
-
-  // Sembunyikan game screen, tampilkan kembali form mode
-  gameScreen.style.display = 'none';
-  document.getElementById('modeModal').style.display = 'flex';
 });
