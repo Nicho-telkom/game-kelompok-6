@@ -7,6 +7,53 @@ let player1Score = 0;
 let player2Score = 0;
 let draws = 0;
 
+const playWithPlayerBtn = document.getElementById("playWithPlayer");
+const playWithBotBtn = document.getElementById("playWithBot");
+const difficultyOptions = document.getElementById("difficultyOptions");
+const botOptions = document.getElementById("botOptions");
+const difficultyButtons = document.querySelectorAll(".difficulty-btn");
+const startBotGameBtn = document.getElementById("startBotGameBtn");
+
+let selectedDifficulty = null;
+let botDifficulty = null;
+
+// Player vs Player
+playWithPlayerBtn.addEventListener("click", () => {
+  document.getElementById("modeModal").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  player2Name = 'Player 2';
+  document.getElementById('player2').value = 'Player 2';
+});
+
+// Player vs Bot
+playWithBotBtn.addEventListener("click", () => {
+  difficultyOptions.style.display = "flex";
+  botOptions.style.display = "none";
+});
+
+difficultyButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedDifficulty = btn.dataset.difficulty;
+    botOptions.style.display = "flex";
+  });
+});
+
+startBotGameBtn.addEventListener("click", () => {
+  const playerName = document.getElementById("botPlayerName").value || "Player";
+  const botName = `Bot (${selectedDifficulty})`;
+
+  player1Name = playerName;
+  player2Name = "Bot";
+  botDifficulty = selectedDifficulty;
+
+  document.getElementById("player1Name").textContent = player1Name;
+  document.getElementById("player2Name").textContent = botName;
+
+  document.getElementById("modeModal").style.display = "none";
+  document.getElementById("gameScreen").style.display = "flex";
+  initializeGame();
+});
+
 // Variabel untuk Achievement
 let player1WinStreak = 0;
 let player2WinStreak = 0;
@@ -28,111 +75,90 @@ const cells = document.querySelectorAll('[data-cell]');
 const currentPlayerDisplay = document.getElementById('currentPlayer');
 const winningMessage = document.getElementById('winning-message');
 const restartButton = document.getElementById('restartButton');
+const endSessionButton = document.getElementById('endSessionButton');
 const startButton = document.getElementById('startButton');
 const loginScreen = document.getElementById('loginScreen');
 const gameScreen = document.getElementById('gameScreen');
-
-// 🔹 Tambahan Modal Mode + Toggle Tema
 const modeModal = document.getElementById('modeModal');
+const welcomePopup = document.getElementById('welcomePopup');
+const startGameBtn = document.getElementById('startGameBtn');
+const chooseThemeBtn = document.getElementById('chooseThemeBtn');
+const achievementNotification = document.getElementById('achievementNotification');
 
-// Saat pertama kali load → buka modal mode
+// Welcome
 window.onload = () => {
-  modeModal.style.display = 'flex';
-  loginScreen.style.display = 'none'; 
+  welcomePopup.style.display = 'flex';
+  modeModal.style.display = 'none';
+  loginScreen.style.display = 'none';
   gameScreen.style.display = 'none';
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+  }
 };
 
-// Pilih mode Player vs Player
-document.getElementById('playWithPlayer').addEventListener('click', () => {
-  modeModal.style.display = 'none';
-  loginScreen.style.display = 'flex';
+startGameBtn.addEventListener('click', () => {
+  welcomePopup.style.display = 'none';
+  modeModal.style.display = 'flex';
 });
 
-// Pilih mode vs Bot
-let botDifficulty = 'easy'; // default
-
-const difficultyOptions = document.getElementById('difficultyOptions');
-const playWithBotBtn = document.getElementById('playWithBot');
-const difficultyBtns = document.querySelectorAll('.difficulty-btn');
-
-// Tampilkan pilihan difficulty saat klik Player vs Bot
-playWithBotBtn.addEventListener('click', () => {
-  difficultyOptions.style.display = 'block';
+chooseThemeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
 });
 
-// Pilih difficulty dan mulai game vs Bot
-difficultyBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    botDifficulty = btn.getAttribute('data-difficulty');
-    modeModal.style.display = 'none';
-    player2Name = 'Bot';
-    document.getElementById('player1Name').textContent = player1Name;
-    document.getElementById('player2Name').textContent = player2Name;
-    loginScreen.style.display = 'none';
-    gameScreen.style.display = 'flex';
-    difficultyOptions.style.display = 'none';
-    initializeGame();
-  });
-});
-
-// Toggle Tema
 document.getElementById('toggleTheme').addEventListener('click', () => {
   document.body.classList.toggle('dark');
-  if (document.body.classList.contains('dark')) {
-    localStorage.setItem('theme', 'dark');
-  } else {
-    localStorage.setItem('theme', 'light');
-  }
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
 });
 
-// Terapkan tema saat load
-if (localStorage.getItem('theme') === 'dark') {
-  document.body.classList.add('dark');
-}
-
-// Start game
+// Start PvP
 startButton.addEventListener('click', () => {
   player1Name = document.getElementById('player1').value || 'Player 1';
   if (player2Name !== "Bot") {
     player2Name = document.getElementById('player2').value || 'Player 2';
   }
-
   document.getElementById('player1Name').textContent = player1Name;
   document.getElementById('player2Name').textContent = player2Name;
-
   loginScreen.style.display = 'none';
   gameScreen.style.display = 'flex';
   initializeGame();
 });
 
 function initializeGame() {
+  board = ['', '', '', '', '', '', '', '', ''];
+  gameActive = true;
+  currentPlayer = 'X';
+  winningMessage.textContent = '';
+  document.getElementById('afterWinButtons').style.display = 'none';
+
   cells.forEach(cell => {
     cell.textContent = '';
-    cell.classList.remove('winning');
+    cell.classList.remove('winning', 'x', 'o');
     cell.removeEventListener('click', handleCellClick);
     cell.addEventListener('click', handleCellClick, { once: true });
   });
 
   restartButton.addEventListener('click', restartGame);
+  endSessionButton.addEventListener('click', endSession);
   updateDisplay();
   showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
+  document.getElementById('timerProgressBar').style.width = '100%';
 }
 
 function handleCellClick(e) {
   const cell = e.target;
   const cellIndex = Array.from(cells).indexOf(cell);
-
   if (board[cellIndex] !== '' || !gameActive) return;
 
   board[cellIndex] = currentPlayer;
   cell.textContent = currentPlayer;
+  cell.classList.add(currentPlayer.toLowerCase());
   checkResult();
 }
 
 function checkResult() {
   let roundWon = false;
   let winningCells = [];
-
   for (let [a, b, c] of winConditions) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
       roundWon = true;
@@ -146,23 +172,19 @@ function checkResult() {
     clearInterval(timerInterval);
     const winner = currentPlayer === 'X' ? player1Name : player2Name;
     winningMessage.textContent = `🎉 ${winner} Menang!`;
+    document.getElementById('afterWinButtons').style.display = 'flex';
 
     if (currentPlayer === 'X') {
       player1Score++;
       document.getElementById('player1Score').textContent = player1Score;
-      player1WinStreak++;
-      player2WinStreak = 0;
+      player1WinStreak++; player2WinStreak = 0;
     } else {
       player2Score++;
       document.getElementById('player2Score').textContent = player2Score;
-      player2WinStreak++;
-      player1WinStreak = 0;
+      player2WinStreak++; player1WinStreak = 0;
     }
 
-    winningCells.forEach(index => {
-      cells[index].classList.add('winning');
-    });
-
+    winningCells.forEach(i => cells[i].classList.add('winning'));
     checkAchievements();
     showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
     return;
@@ -172,20 +194,18 @@ function checkResult() {
     gameActive = false;
     clearInterval(timerInterval);
     winningMessage.textContent = '🤝 Permainan Seri!';
+    document.getElementById('afterWinButtons').style.display = 'flex';
     draws++;
     document.getElementById('draws').textContent = draws;
-    player1WinStreak = 0;
-    player2WinStreak = 0;
+    player1WinStreak = 0; player2WinStreak = 0;
     checkAchievements();
     showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
     return;
   }
 
-  // Ganti giliran
   currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
   updateDisplay();
 
-  // Jika vs Bot → giliran Bot
   if (player2Name === "Bot" && gameActive && currentPlayer === "O") {
     setTimeout(botMove, 500);
   }
@@ -194,196 +214,184 @@ function checkResult() {
 function botMove() {
   let index;
   if (botDifficulty === 'easy') {
-    // Random move
-    let emptyCells = [...cells].filter((c, i) => board[i] === '');
-    if (emptyCells.length === 0) return;
-    let randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    index = Array.from(cells).indexOf(randomCell);
+    let empty = [...cells].filter((c, i) => board[i] === '');
+    if (!empty.length) return;
+    index = Array.from(cells).indexOf(empty[Math.floor(Math.random() * empty.length)]);
   } else if (botDifficulty === 'medium') {
-    // Coba menang, jika tidak random
     index = getWinningMove('O');
     if (index === -1) index = getWinningMove('X');
     if (index === -1) {
-      let emptyCells = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
-      index = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+      let empty = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+      index = empty[Math.floor(Math.random() * empty.length)];
     }
   } else if (botDifficulty === 'hard') {
-    // Minimax
     index = getBestMove();
   }
-
   if (index === undefined || board[index] !== '') return;
   board[index] = currentPlayer;
   cells[index].textContent = currentPlayer;
+  cells[index].classList.add(currentPlayer.toLowerCase());
   cells[index].removeEventListener('click', handleCellClick);
-
   checkResult();
 }
 
-// Cari langkah menang/tahan
-function getWinningMove(player) {
+function getWinningMove(p) {
   for (let [a, b, c] of winConditions) {
-    let values = [board[a], board[b], board[c]];
-    if (values.filter(v => v === player).length === 2 && values.includes('')) {
+    let vals = [board[a], board[b], board[c]];
+    if (vals.filter(v => v === p).length === 2 && vals.includes('')) {
       return [a, b, c].find(i => board[i] === '');
     }
   }
   return -1;
 }
 
-// Minimax untuk hard mode
 function getBestMove() {
-  let bestScore = -Infinity;
-  let move;
+  let best = -Infinity, move;
   for (let i = 0; i < board.length; i++) {
     if (board[i] === '') {
       board[i] = 'O';
       let score = minimax(board, 0, false);
       board[i] = '';
-      if (score > bestScore) {
-        bestScore = score;
-        move = i;
-      }
+      if (score > best) { best = score; move = i; }
     }
   }
   return move;
 }
 
-function minimax(newBoard, depth, isMaximizing) {
-  let result = checkWinnerForMinimax(newBoard);
-  if (result !== null) {
-    if (result === 'O') return 10 - depth;
-    else if (result === 'X') return depth - 10;
+function minimax(bd, depth, isMax) {
+  let res = checkWinnerForMinimax(bd);
+  if (res !== null) {
+    if (res === 'O') return 10 - depth;
+    else if (res === 'X') return depth - 10;
     else return 0;
   }
-
-  if (isMaximizing) {
-    let bestScore = -Infinity;
-    for (let i = 0; i < newBoard.length; i++) {
-      if (newBoard[i] === '') {
-        newBoard[i] = 'O';
-        let score = minimax(newBoard, depth + 1, false);
-        newBoard[i] = '';
-        bestScore = Math.max(score, bestScore);
+  if (isMax) {
+    let best = -Infinity;
+    for (let i = 0; i < bd.length; i++) {
+      if (bd[i] === '') {
+        bd[i] = 'O';
+        let score = minimax(bd, depth + 1, false);
+        bd[i] = ''; best = Math.max(score, best);
       }
     }
-    return bestScore;
+    return best;
   } else {
-    let bestScore = Infinity;
-    for (let i = 0; i < newBoard.length; i++) {
-      if (newBoard[i] === '') {
-        newBoard[i] = 'X';
-        let score = minimax(newBoard, depth + 1, true);
-        newBoard[i] = '';
-        bestScore = Math.min(score, bestScore);
+    let best = Infinity;
+    for (let i = 0; i < bd.length; i++) {
+      if (bd[i] === '') {
+        bd[i] = 'X';
+        let score = minimax(bd, depth + 1, true);
+        bd[i] = ''; best = Math.min(score, best);
       }
     }
-    return bestScore;
+    return best;
   }
 }
 
 function checkWinnerForMinimax(bd) {
   for (let [a, b, c] of winConditions) {
-    if (bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) {
-      return bd[a];
-    }
+    if (bd[a] && bd[a] === bd[b] && bd[a] === bd[c]) return bd[a];
   }
   if (!bd.includes('')) return 'draw';
   return null;
 }
 
 function updateDisplay() {
-  const playerName = currentPlayer === 'X' ? player1Name : player2Name;
-  currentPlayerDisplay.textContent = `${playerName} (${currentPlayer})`;
+  currentPlayerDisplay.textContent = currentPlayer === 'X' ? player1Name : player2Name;
+  const indicator = currentPlayerDisplay.closest('.turn-indicator');
+  currentPlayer === 'X' ? indicator.classList.remove('o') : indicator.classList.add('o');
   startTurnTimer();
 }
 
-// Mulai timer setiap giliran
+// Timer
 let timerInterval;
 let timerDuration = 10;
 const timerCount = document.getElementById('timerCount');
+const timerProgressBar = document.getElementById('timerProgressBar');
 
 function startTurnTimer() {
   clearInterval(timerInterval);
   let timeLeft = timerDuration;
   timerCount.textContent = timeLeft;
+  timerProgressBar.style.width = '100%';
+  timerProgressBar.style.transition = `width ${timerDuration}s linear`;
+  void timerProgressBar.offsetWidth;
+  timerProgressBar.style.width = '0%';
   timerInterval = setInterval(() => {
     timeLeft--;
     timerCount.textContent = timeLeft;
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      handleTimeout();
-    }
+    if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); }
   }, 1000);
 }
 
-// Reset timer saat restart game
 function restartGame() {
-  currentPlayer = 'X';
-  board = ['', '', '', '', '', '', '', '', ''];
-  gameActive = true;
-  winningMessage.textContent = '';
-  player1WinStreak = 0;
-  player2WinStreak = 0;
-  clearInterval(timerInterval);
-  timerCount.textContent = timerDuration;
   initializeGame();
 }
 
-// Timer timeout: otomatis pindah giliran
+function endSession() {
+  clearInterval(timerInterval);
+  player1Score = 0; player2Score = 0; draws = 0;
+  document.getElementById('player1Score').textContent = 0;
+  document.getElementById('player2Score').textContent = 0;
+  document.getElementById('draws').textContent = 0;
+  resetBoardOnly();
+  gameScreen.style.display = 'none';
+  modeModal.style.display = 'flex';
+}
+
 function handleTimeout() {
   if (!gameActive) return;
-  // Jika cell belum diisi, langsung pindah giliran
   currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
   updateDisplay();
   startTurnTimer();
-  // Jika vs Bot dan giliran Bot, langsung botMove
   if (player2Name === "Bot" && gameActive && currentPlayer === "O") {
     setTimeout(botMove, 500);
   }
 }
 
-// Stop timer saat kembali ke menu
+// Back button
 const backButton = document.getElementById('backButton');
-
 backButton.addEventListener('click', () => {
   clearInterval(timerInterval);
-  // Reset game
-  board = ['', '', '', '', '', '', '', '', ''];
-  gameActive = true;
-  currentPlayer = 'X';
-  winningMessage.textContent = '';
-
-  cells.forEach(cell => {
-    cell.textContent = '';
-    cell.classList.remove('winning');
-  });
-
-  // Sembunyikan game screen, tampilkan kembali form mode
+  resetBoardOnly();
   gameScreen.style.display = 'none';
-  document.getElementById('modeModal').style.display = 'flex';
+  modeModal.style.display = 'flex';
 });
 
-// Update isi Achievement Box di sidebar
-function showAchievement(score) {
-  const achievementList = document.getElementById('achievementList');
-  achievementList.innerHTML = `
-    <li>${player1Name}: <strong>${score.player1}</strong> poin</li>
-    <li>${player2Name}: <strong>${score.player2}</strong> poin</li>
-    <li>Seri: <strong>${score.seri}</strong></li>
-  `;
+function resetBoardOnly() {
+  board = ['', '', '', '', '', '', '', '', ''];
+  gameActive = true; currentPlayer = 'X';
+  winningMessage.textContent = '';
+  document.getElementById('afterWinButtons').style.display = 'none';
+  player1WinStreak = 0; player2WinStreak = 0;
+  cells.forEach(c => { c.textContent = ''; c.classList.remove('winning','x','o'); });
 }
-const welcomePopup = document.getElementById('welcomePopup');
-welcomePopup.addEventListener('animationstart', (e) => {
-  if (e.animationName === 'slideDown') {
-    welcomePopup.style.display = 'flex';
-    modeModal.style.display = 'none';
+
+function showAchievement(score) {
+  const list = document.getElementById('achievementList');
+  list.innerHTML = `
+    <li>${player1Name}: <strong class="score-value">${score.player1}</strong> poin</li>
+    <li>${player2Name}: <strong class="score-value">${score.player2}</strong> poin</li>
+    <li>Seri: <strong class="score-value">${score.seri}</strong></li>`;
+}
+
+function checkAchievements() {
+  if (draws === 1 && !achievements.firstDraw.achieved) {
+    achievements.firstDraw.achieved = true;
+    showAchievementNotification(achievements.firstDraw.message);
   }
-});
-// Saat animasi selesai → tampilkan modal mode
-welcomePopup.addEventListener('animationend', (e) => {
-  if (e.animationName === 'slideUp') {
-    welcomePopup.style.display = 'none';
-    modeModal.style.display = 'flex';
+  if (player1Score >= 5 && !achievements.fiveWins.player1) {
+    achievements.fiveWins.player1 = true;
+    showAchievementNotification(`${player1Name} mencapai ${achievements.fiveWins.message}`);
   }
-});
+  if (player1WinStreak >= 3 && !achievements.threeWinStreak.player1) {
+    achievements.threeWinStreak.player1 = true;
+    showAchievementNotification(`${player1Name} mencapai ${achievements.threeWinStreak.message}`);
+  }
+}
+
+function showAchievementNotification(msg) {
+  achievementNotification.textContent = `✨ ${msg}`;
+  achievementNotification.classList.add('show');
+  setTimeout(() => achievementNotification.classList.remove('show'), 3000);
+}

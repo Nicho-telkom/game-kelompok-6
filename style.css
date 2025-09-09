@@ -1,8 +1,128 @@
+/* General Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #1f1c2c, #928DAB);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Prevent scrollbar from animations */
+}
+
+/* Dark Theme */
+body.dark {
+  background: linear-gradient(135deg, #0a0f1c, #1b2a49);
+  color: #ddd;
+}
+
+body.dark .modal,
+body.dark .modal-content,
+body.dark .login-box,
+body.dark .game-box,
+body.dark .card {
+  background: rgba(20, 20, 35, 0.8);
+  color: #ddd;
+}
+
+body.dark .cell {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.15);
+}
+
+body.dark input {
+  background-color: rgba(255,255,255,0.1);
+  color: #ddd;
+}
+
+/* Buttons */
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-main, .start-game-btn, .restart-btn, .mode-btn {
+  background: linear-gradient(90deg, #ff6a00, #ee0979);
+  color: #fff;
+}
+
+.btn-main:hover, .start-game-btn:hover, .restart-btn:hover, .mode-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 106, 0, 0.6);
+}
+
+.btn-secondary, .theme-toggle-btn, .back-btn {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+.btn-secondary:hover, .theme-toggle-btn:hover, .back-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.05);
+}
+
+/* Welcome Popup */
+.welcome-popup {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f1c2c, #928DAB);
+  z-index: 2000;
+  animation: fadeIn 0.8s ease;
+}
+
+.welcome-card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  padding: 40px 30px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  transform: scale(0.9);
+  animation: popupIn 0.6s ease forwards;
+  max-width: 400px;
+  width: 90%;
+}
+
+.welcome-card .game-title {
+  font-family: 'Press Start 2P', cursive; /* Retro font for title */
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #ffda79, #ff6a00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome-card .tagline {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #e0e0e0;
+}
+
+.welcome-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons */
+  gap: 15px;
+}
+
+/* Modal Styles */
 .modal {
   position: fixed;
   top: 0;
@@ -26,55 +146,87 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-.modal-content button {
-  display: block;
+.modal-content .mode-btn {
   width: 100%;
   margin: 10px 0;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #ff6a00, #ee0979);
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
 }
 
-.modal-content button:hover {
-  box-shadow: 0 0 20px #ff6a00;
+.difficulty-options {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: none; /* Controlled by JS */
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* 🔹 Tema Dark */
-body.dark {
-  background: linear-gradient(135deg, #0a0f1c, #1b2a49);
-  color: #ddd;
-}
-body.dark .modal,
-body.dark .modal-content,
-body.dark .login-box,
-body.dark .game-box,
-body.dark .leaderboard,
-body.dark .achievement-box {
-  background: rgba(20, 20, 35, 0.8);
-  color: #ddd;
+.difficulty-options label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: #ffda79;
 }
 
-body.dark .cell {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.15);
+.difficulty-buttons-group {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
 }
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #1f1c2c, #928DAB);
+
+.difficulty-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
   color: #fff;
-  min-height: 100vh;
+  font-size: 0.9rem;
+  padding: 8px;
 }
+
+.difficulty-btn:hover {
+  background: rgba(255,255,255,0.2);
+  box-shadow: none;
+}
+
+.difficulty-btn[data-difficulty="easy"] { color: #8bc34a; }
+.difficulty-btn[data-difficulty="medium"] { color: #ffeb3b; }
+.difficulty-btn[data-difficulty="hard"] { color: #f44336; }
+
+.theme-toggle-btn {
+  width: 100%;
+  margin-top: 20px
+  ;
+}
+.bot-options {
+  margin-top: 20px;
+  display: none; /* tampil setelah pilih difficulty */
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bot-options input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.bot-options input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
 
 /* Login Screen */
 .login-screen {
-  display: flex;
+  display: none; /* Controlled by JS */
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .login-box {
@@ -90,8 +242,8 @@ body {
 }
 
 .login-box h1.title {
+  font-family: 'Press Start 2P', cursive;
   font-size: 2.5rem;
-  font-weight: 700;
   margin-bottom: 20px;
   background: linear-gradient(90deg, #ff6a00, #ee0979);
   -webkit-background-clip: text;
@@ -102,6 +254,10 @@ body {
   display: block;
   margin: 10px 0 5px;
   font-weight: 600;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .login-box input {
@@ -112,59 +268,126 @@ body {
   margin-bottom: 15px;
   text-align: center;
   font-size: 1rem;
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
 }
 
-.login-box button {
+.login-box input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+.login-box input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ff6a00;
+}
+
+.start-game-btn {
   width: 100%;
   padding: 12px;
   font-size: 1.1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #ff6a00, #ee0979);
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.login-box button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #ff6a00;
-}
-
-/* Game Screen */
 .game-screen {
-  display: none;
+  display: none; /* Controlled by JS */
   text-align: center;
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  justify-content: center;   /* Tengah vertical */
+  align-items: center;       /* Tengah horizontal */
+  padding: 20px;
+  position: relative;        /* jangan absolute biar bisa center */
 }
 
-h1 {
+
+.game-screen h1 {
+  font-family: 'Press Start 2P', cursive;
   font-size: 2.2rem;
-  font-weight: 700;
   background: linear-gradient(90deg, #ff6a00, #ee0979);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 15px;
 }
 
-.turn-indicator {
-  background: rgba(255,255,255,0.1);
-  padding: 10px 20px;
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
   border-radius: 12px;
-  font-size: 1.1rem;
-  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
   color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-#currentPlayer {
-  color: #ffda79;
-  font-weight: bold;
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+}
+
+.game-info-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 auto 20px auto;  /* Tengah horizontal */
+  width: fit-content;        /* Nggak full */
+  min-width: 400px;          /* Biar nggak sempit */
+}
+
+
+/* Turn Indicator */
+.turn-indicator {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.turn-indicator strong {
+  color: #ff6a00; /* default for X */
+  transition: color 0.3s ease;
+}
+
+.turn-indicator.o strong {
+  color: #00f2fe; /* color for O */
+}
+
+/* Timer */
+.turn-timer {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.timer-progress-bar-container {
+  width: 100px;
+  height: 8px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timer-progress-bar {
+  height: 100%;
+  width: 100%; /* Initial width */
+  background: linear-gradient(90deg, #00f2fe, #ff6a00);
+  border-radius: 4px;
+  transition: width 1s linear; /* Smooth transition for width change */
 }
 
 .game-box {
@@ -173,224 +396,242 @@ h1 {
   border-radius: 20px;
   padding: 25px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  margin-top: 20px;
-  width: 100%;
+  margin: 20px auto 0 auto; 
+  width: fit-content;        /* Ikuti isi, bukan full */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .board-container {
   display: flex;
-  justify-content: center;
+  justify-content: center;   /* Rata tengah horizontal */
   align-items: flex-start;
   gap: 40px;
-  flex-wrap: wrap;
 }
+
 
 /* Board */
 .board {
-  flex: 1;
   display: grid;
-  grid-template-columns: repeat(3, 120px);
-  grid-template-rows: repeat(3, 120px);
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
   gap: 15px;
   justify-content: center;
+  margin: 0 auto; /* Center board within its container */
+  transition: transform 0.3s ease;
 }
 
 .cell {
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-size: 3rem;
-  font-weight: bold;
-  border-radius: 15px;
+  justify-content: center;
+  font-size: 2.8rem; /* Slightly larger font for X/O */
+  font-weight: 700;
   color: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative; /* For potential animations */
+  overflow: hidden;
 }
 
 .cell:hover {
-  background: rgba(255,255,255,0.2);
-  box-shadow: 0 0 15px #ff6a00;
-  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 106, 0, 0.4);
 }
 
-.winning {
-  background: #32CD32 !important;
-  color: #fff !important;
-  box-shadow: 0 0 20px #32CD32;
-  animation: pulse 1s infinite;
+/* X and O colors */
+.cell.x { color: #ff6a00; }
+.cell.o { color: #00f2fe; }
+
+/* Winning Cells Animation */
+.cell.winning {
+  animation: winningCellPulse 1s infinite alternate;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+@keyframes winningCellPulse {
+  from { box-shadow: 0 0 15px rgba(255, 218, 121, 0.8); }
+  to { box-shadow: 0 0 30px rgba(255, 218, 121, 1); }
 }
 
-/* Sidebar */
+/* Sidebar Cards */
 .sidebar {
-  width: 250px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 250px; /* Ensure sidebar has enough width */
 }
 
-.leaderboard, .achievement-box {
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(8px);
-  border-radius: 15px;
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  color: #fff;
-  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
 }
 
-.leaderboard h3, .achievement-box h3 {
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h3 {
+  font-size: 1.2rem;
   margin-bottom: 10px;
-  font-size: 1.3rem;
-  color: #ffda79;
+  color: #ffb347;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.leaderboard p {
-  margin: 6px 0;
+.card ul, .card p {
+  font-size: 0.95rem;
+  color: #eee;
+  line-height: 1.6;
 }
 
-/* Achievement popup */
-.achievement-message {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: #4CAF50;
-  color: white;
-  padding: 15px 25px;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  visibility: hidden;
-  z-index: 1001;
-  text-align: center;
-  min-width: 300px;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.achievement-message.show {
-  opacity: 1;
-  visibility: visible;
-  animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-}
-.achievement-box ul {
+.card ul {
   list-style: none;
   padding: 0;
-  margin: 0;
-  text-align: center;
 }
 
-.achievement-box li {
-  margin: 6px 0;
-  font-size: 1rem;
-}
-
-
-@keyframes slideIn {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; transform: translateX(-100%); }
-}
-/* Kotak Achievement (Leaderboard mini) */
-.achievement {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgb(239, 237, 237);
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  padding: 15px 20px;
-  width: 250px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  z-index: 1000;
-}
-/* Tombol */
-#restartButton, #startButton {
-  padding: 14px 32px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #ff6a00, #ee0979);
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 20px;
-}
-
-#restartButton:hover, #startButton:hover {
-  box-shadow: 0 0 20px #ff6a00;
-  transform: scale(1.05);
-}
-
-/* Pesan kemenangan */
-#winning-message {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 15px 0;
+.score-value {
+  font-weight: 700;
   color: #ffda79;
 }
-.welcome-popup {
+
+/* Winning Message */
+.winning-message {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 25px 0;
+  color: #ffda79;
+  animation: fadeInScale 0.8s ease forwards;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Achievement Notification */
+.achievement-notification {
   position: fixed;
-  top: -100px; /* mulai dari atas */
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, #ff6a00, #ee0979);
-  padding: 20px 40px;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
   color: white;
-  border-radius: 15px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  box-shadow: 0 0 20px #ff6a00;
-  opacity: 0;
-  z-index: 2000;
-  animation: slideDown 1s ease forwards,
-             stayCenter 2s ease 1s forwards,
-             slideUp 1s ease 3s forwards;
-}
-
-@keyframes slideDown {
-  from { top: -100px; opacity: 0; }
-  to { top: 50%; opacity: 1; transform: translate(-50%, -50%); }
-}
-
-@keyframes stayCenter {
-  from { top: 50%; opacity: 1; }
-  to { top: 50%; opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { top: 40%; opacity: 1; }
-  to { top: -100px; opacity: 0; }
-}
-.back-btn {
-  position: absolute;
-  top: 90px;
-  left: 315px;
-  padding: 10px 18px;
-  font-size: 1rem;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #ff6a00, #ee0979);
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  padding: 12px 25px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  font-weight: 600;
   z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease, transform 0.5s ease;
 }
 
-.back-btn:hover {
-  box-shadow: 0 0 15px #ff6a00;
-  transform: scale(1.05);
+.achievement-notification.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+/* Restart button */
+.restart-btn {
+  margin: 30px auto;
+  padding: 12px 30px;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .board-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .sidebar {
+    width: 90%;
+    max-width: 400px;
+    margin-left: 0;
+  }
+
+  .game-info-bar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .back-btn {
+    position: static; /* Remove absolute positioning */
+    margin-bottom: 20px;
+  }
+
+  .game-screen h1 {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-card .game-title, .game-screen h1 {
+    font-size: 1.8rem;
+  }
+
+  .login-box h1.title {
+    font-size: 2rem;
+  }
+
+  .board {
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 10px;
+  }
+
+  .cell {
+    font-size: 2.2rem;
+  }
+
+  .modal-content, .login-box {
+    padding: 25px;
+  }
+
+  .winning-message {
+    font-size: 1.3rem;
+  }
+
+/* Tombol setelah menang */
+#afterWinButtons {
+  display: none; /* disembunyikan default */
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 15px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
 }

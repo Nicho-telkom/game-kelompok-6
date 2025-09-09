@@ -1,62 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tic Tac Toe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Modal Input Nama -->
+  <!-- Welcome Popup -->
   <div id="welcomePopup" class="welcome-popup">
-    <div>
-      <h2>👋 Selamat Datang di Tic Tac Toe</h2>
+    <div class="welcome-card">
+      <h1 class="game-title">👋 Selamat Datang</h1>
+      <p class="tagline">Mainkan Tic Tac Toe dengan gaya modern!</p>
+      <div class="welcome-buttons">
+        <button id="startGameBtn" class="btn-main"><i class="fas fa-play"></i> Mulai Game</button>
+        <button id="chooseThemeBtn" class="btn-secondary"><i class="fas fa-palette"></i> Pilih Tema</button>
+      </div>
     </div>
-</div>
-  <!-- Modal Pilihan Mode -->
-<div id="modeModal" class="modal">
-  <div class="modal-content">
-    <h2>Pilih Mode Permainan</h2>
-    <button id="playWithPlayer">👥 Player vs Player</button>
-    <button id="playWithBot">🤖 Player vs Bot</button>
-    <div id="difficultyOptions" style="display:none; margin-top:10px;">
-  <label style="font-weight:600; margin-bottom:5px; display:block;">Pilih Difficulty:</label>
-  <button class="difficulty-btn" data-difficulty="easy">🟢 Easy</button>
-  <button class="difficulty-btn" data-difficulty="medium">🟡 Medium</button>
-  <button class="difficulty-btn" data-difficulty="hard">🔴 Hard</button>
-</div>
-    <button id="toggleTheme">🌙 Ganti Tema</button>
   </div>
-</div>
-  <!-- Halaman Login -->
+
+  <!-- Modal Pilihan Mode -->
+  <div id="modeModal" class="modal">
+    <div class="modal-content">
+      <h2>Pilih Mode Permainan</h2>
+      <button id="playWithPlayer" class="mode-btn"><i class="fas fa-users"></i> Player vs Player</button>
+      <button id="playWithBot" class="mode-btn"><i class="fas fa-robot"></i> Player vs Bot</button>
+
+      <div id="difficultyOptions" class="difficulty-options">
+        <label>Pilih Difficulty:</label>
+        <div class="difficulty-buttons-group">
+          <button class="difficulty-btn" data-difficulty="easy">🟢 Easy</button>
+          <button class="difficulty-btn" data-difficulty="medium">🟡 Medium</button>
+          <button class="difficulty-btn" data-difficulty="hard">🔴 Hard</button>
+        </div>
+      </div>
+
+      <!-- Bot Options -->
+      <div id="botOptions" class="bot-options">
+        <div class="form-group">
+          <label for="botPlayerName"><i class="fas fa-user"></i> Nama Kamu:</label>
+          <input type="text" id="botPlayerName" placeholder="Masukkan nama kamu" value="Player">
+        </div>
+        <button id="startBotGameBtn" class="start-game-btn"><i class="fas fa-gamepad"></i> Mulai Lawan Bot</button>
+      </div>
+
+      <button id="toggleTheme" class="theme-toggle-btn"><i class="fas fa-moon"></i> Ganti Tema</button>
+    </div>
+  </div>
+
+  <!-- Login Player vs Player -->
   <div class="login-screen" id="loginScreen">
     <div class="login-box">
       <h2>Player VS Player</h2>
       <h1 class="title">Tic Tac Toe</h1>
       <div class="form-group">
-        <label for="player1">Player 1 (X):</label>
+        <label for="player1"><i class="fas fa-user"></i> Player 1 (X):</label>
         <input type="text" id="player1" placeholder="Masukkan nama" value="Player 1">
       </div>
       <div class="form-group">
-        <label for="player2">Player 2 (O):</label>
+        <label for="player2"><i class="fas fa-user"></i> Player 2 (O):</label>
         <input type="text" id="player2" placeholder="Masukkan nama" value="Player 2">
       </div>
-      <button id="startButton">Mulai Permainan</button>
+      <button id="startButton" class="start-game-btn"><i class="fas fa-gamepad"></i> Mulai Permainan</button>
     </div>
   </div>
 
   <!-- Halaman Game -->
   <div class="game-screen" id="gameScreen">
+    <button id="backButton" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</button>
     <h1>Tic Tac Toe</h1>
-    <button id="backButton" class="back-btn">⬅ Kembali</button>
-    <div class="turn-indicator">
-      Giliran: <strong id="currentPlayer">X</strong>
+
+    <div class="game-info-bar">
+      <div class="turn-indicator">
+        Giliran: <strong id="currentPlayer">X</strong>
+      </div>
+      <div class="turn-timer">
+        Waktu: <span id="timerCount">10</span> detik
+        <div class="timer-progress-bar-container">
+          <div id="timerProgressBar" class="timer-progress-bar"></div>
+        </div>
+      </div>
     </div>
-    <div class="turn-timer" style="font-weight:600; margin-bottom:10px;">
-      Waktu: <span id="timerCount">10</span> detik
-    </div>
-    
+
     <div class="game-box">
       <div class="board-container">
         <!-- Board -->
@@ -74,15 +101,15 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
-          <div class="leaderboard">
-            <h3>🏆 Leaderboard</h3>
-            <p><span id="player1Name">Player 1</span>: <strong><span id="player1Score">0</span></strong> Menang</p>
-            <p><span id="player2Name">Player 2</span>: <strong><span id="player2Score">0</span></strong> Menang</p>
-            <p>Seri: <strong><span id="draws">0</span></strong></p>
+          <div class="leaderboard card">
+            <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
+            <p><span id="player1Name">Player 1</span>: <strong class="score-value" id="player1Score">0</strong> Menang</p>
+            <p><span id="player2Name">Player 2</span>: <strong class="score-value" id="player2Score">0</strong> Menang</p>
+            <p>Seri: <strong class="score-value" id="draws">0</strong></p>
           </div>
 
-          <div id="achievementBox" class="achievement-box">
-            <h3>✨ Achievement</h3>
+          <div id="achievementBox" class="achievement-box card">
+            <h3><i class="fas fa-star"></i> Achievement</h3>
             <ul id="achievementList">
               <li>Belum ada</li>
             </ul>
@@ -91,9 +118,16 @@
       </div>
     </div>
 
-    <h2 id="winning-message"></h2>
-    <div id="achievementMessage" class="achievement-message"></div>
-    <button id="restartButton">Main Lagi</button>
+    <!-- Pesan Kemenangan -->
+    <h2 id="winning-message" class="winning-message"></h2>
+
+    <!-- Tombol setelah menang -->
+    <div id="afterWinButtons">
+      <button id="restartButton" class="restart-btn"><i class="fas fa-redo-alt"></i> Main Lagi</button>
+      <button id="endSessionButton" class="restart-btn"><i class="fas fa-power-off"></i> Main Lagi (Sesi Baru)</button>
+    </div>
+
+    <div id="achievementNotification" class="achievement-notification"></div>
   </div>
 
   <script src="game.js"></script>
