@@ -1,3 +1,5 @@
+// ====== TicTacToe Full JS (with sound + background music) ======
+
 let currentPlayer = 'X';
 let board = ['', '', '', '', '', '', '', '', ''];
 let gameActive = true;
@@ -17,44 +19,34 @@ const startBotGameBtn = document.getElementById("startBotGameBtn");
 let selectedDifficulty = null;
 let botDifficulty = null;
 
-// Player vs Player
-playWithPlayerBtn.addEventListener("click", () => {
-  document.getElementById("modeModal").style.display = "none";
-  document.getElementById("loginScreen").style.display = "flex";
-  player2Name = 'Player 2';
-  document.getElementById('player2').value = 'Player 2';
-});
+// Elements
+const cells = document.querySelectorAll('[data-cell]');
+const currentPlayerDisplay = document.getElementById('currentPlayer');
+const winningMessage = document.getElementById('winning-message');
+const restartButton = document.getElementById('restartButton');
+const endSessionButton = document.getElementById('endSessionButton');
+const startButton = document.getElementById('startButton');
+const loginScreen = document.getElementById('loginScreen');
+const gameScreen = document.getElementById('gameScreen');
+const modeModal = document.getElementById('modeModal');
+const welcomePopup = document.getElementById('welcomePopup');
+const startGameBtn = document.getElementById('startGameBtn');
+const chooseThemeBtn = document.getElementById('chooseThemeBtn');
+const achievementNotification = document.getElementById('achievementNotification');
+const backButton = document.getElementById('backButton');
 
-// Player vs Bot
-playWithBotBtn.addEventListener("click", () => {
-  difficultyOptions.style.display = "flex";
-  botOptions.style.display = "none";
-});
+// Welcome / Theme / UI initial
+window.onload = () => {
+  if (welcomePopup) welcomePopup.style.display = 'flex';
+  if (modeModal) modeModal.style.display = 'none';
+  if (loginScreen) loginScreen.style.display = 'none';
+  if (gameScreen) gameScreen.style.display = 'none';
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+  }
+};
 
-difficultyButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    selectedDifficulty = btn.dataset.difficulty;
-    botOptions.style.display = "flex";
-  });
-});
-
-startBotGameBtn.addEventListener("click", () => {
-  const playerName = document.getElementById("botPlayerName").value || "Player";
-  const botName = `Bot (${selectedDifficulty})`;
-
-  player1Name = playerName;
-  player2Name = "Bot";
-  botDifficulty = selectedDifficulty;
-
-  document.getElementById("player1Name").textContent = player1Name;
-  document.getElementById("player2Name").textContent = botName;
-
-  document.getElementById("modeModal").style.display = "none";
-  document.getElementById("gameScreen").style.display = "flex";
-  initializeGame();
-});
-
-// Variabel untuk Achievement
+// ===== Achievements / State =====
 let player1WinStreak = 0;
 let player2WinStreak = 0;
 let achievements = {
@@ -71,78 +63,233 @@ const winConditions = [
   [0, 4, 8], [2, 4, 6]
 ];
 
-const cells = document.querySelectorAll('[data-cell]');
-const currentPlayerDisplay = document.getElementById('currentPlayer');
-const winningMessage = document.getElementById('winning-message');
-const restartButton = document.getElementById('restartButton');
-const endSessionButton = document.getElementById('endSessionButton');
-const startButton = document.getElementById('startButton');
-const loginScreen = document.getElementById('loginScreen');
-const gameScreen = document.getElementById('gameScreen');
-const modeModal = document.getElementById('modeModal');
-const welcomePopup = document.getElementById('welcomePopup');
-const startGameBtn = document.getElementById('startGameBtn');
-const chooseThemeBtn = document.getElementById('chooseThemeBtn');
-const achievementNotification = document.getElementById('achievementNotification');
+// ====== SOUND: helper + background music support ======
 
-// Welcome
-window.onload = () => {
-  welcomePopup.style.display = 'flex';
-  modeModal.style.display = 'none';
-  loginScreen.style.display = 'none';
-  gameScreen.style.display = 'none';
-  if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark');
+// Try to get audio element by id; fallback to new Audio() using guessed filename (.wav first, then .mp3)
+function getAudioByIdOrCreate(id) {
+  let el = document.getElementById(id);
+  if (el) return el;
+
+  // fallback guess filenames (prefer .wav)
+  const name = id.replace(/^sound/i, '').toLowerCase(); // e.g., "soundPlace" -> "place"
+  const wavPath = `${name}.wav`;
+  const mp3Path = `${name}.mp3`;
+
+  // create Audio and try .wav (browser will handle if missing with error)
+  try {
+    const audio = new Audio(wavPath);
+    // don't auto-play here; return audio object
+    return audio;
+  } catch (e) {
+    return new Audio(mp3Path);
   }
-};
+}
 
-startGameBtn.addEventListener('click', () => {
-  welcomePopup.style.display = 'none';
-  modeModal.style.display = 'flex';
-});
-
-chooseThemeBtn.addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-});
-
-document.getElementById('toggleTheme').addEventListener('click', () => {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-});
-
-// Start PvP
-startButton.addEventListener('click', () => {
-  player1Name = document.getElementById('player1').value || 'Player 1';
-  if (player2Name !== "Bot") {
-    player2Name = document.getElementById('player2').value || 'Player 2';
+// Play sound by id (supports both <audio id="soundPlace"> in HTML or fallback to file "place.wav")
+function playSound(id) {
+  try {
+    const el = getAudioByIdOrCreate(id);
+    if (!el) return;
+    // some audio objects created dynamically don't support currentTime before loading; try/catch
+    try { el.currentTime = 0; } catch (err) {}
+    // play returns a promise; ignore errors (e.g., blocked autoplay) because most sounds happen after user click
+    el.play().catch(() => {});
+  } catch (err) {
+    // silent fail
+    // console.log("Play sound error:", err);
   }
-  document.getElementById('player1Name').textContent = player1Name;
-  document.getElementById('player2Name').textContent = player2Name;
-  loginScreen.style.display = 'none';
-  gameScreen.style.display = 'flex';
-  initializeGame();
+}
+
+// Background music: attempt to use <audio id="backgroundMusic"> if present, else create Audio('background.mp3')
+let backgroundMusic = (function() {
+  const el = document.getElementById('backgroundMusic');
+  if (el) {
+    el.loop = true;
+    // default volume if not set
+    if (typeof el.volume === 'number') el.volume = 0.45;
+    return el;
+  } else {
+    // fallback audio object (user must have background.mp3 or background.wav in same folder)
+    const a = new Audio('background.mp3');
+    a.loop = true;
+    a.volume = 0.45;
+    return a;
+  }
+})();
+
+let backgroundPlaying = false;
+
+function startBackgroundMusic() {
+  if (!backgroundMusic) return;
+  backgroundMusic.play().catch(() => {
+    // autoplay may be blocked until user interacts; ignore
+  });
+  backgroundPlaying = true;
+}
+
+function pauseBackgroundMusic() {
+  if (!backgroundMusic) return;
+  try { backgroundMusic.pause(); } catch (e) {}
+  backgroundPlaying = false;
+}
+
+function toggleBackgroundMusic() {
+  if (backgroundPlaying) pauseBackgroundMusic();
+  else startBackgroundMusic();
+}
+
+// If there's a toggle button in HTML with id="toggleMusic", hook it
+const toggleMusicBtn = document.getElementById('toggleMusic');
+if (toggleMusicBtn) {
+  toggleMusicBtn.addEventListener('click', () => {
+    playSound("soundClick");
+    toggleBackgroundMusic();
+    // optional UI feedback: toggle active class
+    toggleMusicBtn.classList.toggle('muted', !backgroundPlaying);
+  });
+}
+
+// ====== UI event bindings (set once, avoid duplicates) ======
+
+// Mode buttons
+if (playWithPlayerBtn) {
+  playWithPlayerBtn.addEventListener("click", () => {
+    playSound("soundClick");
+    if (modeModal) modeModal.style.display = "none";
+    if (loginScreen) loginScreen.style.display = "flex";
+    player2Name = 'Player 2';
+    const p2input = document.getElementById('player2');
+    if (p2input) p2input.value = 'Player 2';
+  });
+}
+if (playWithBotBtn) {
+  playWithBotBtn.addEventListener("click", () => {
+    playSound("soundClick");
+    if (difficultyOptions) difficultyOptions.style.display = "flex";
+    if (botOptions) botOptions.style.display = "none";
+  });
+}
+difficultyButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    playSound("soundClick");
+    selectedDifficulty = btn.dataset.difficulty;
+    if (botOptions) botOptions.style.display = "flex";
+  });
 });
+if (startBotGameBtn) {
+  startBotGameBtn.addEventListener("click", () => {
+    playSound("soundClick");
+    const playerName = document.getElementById("botPlayerName").value || "Player";
+    const botName = `Bot (${selectedDifficulty})`;
+
+    player1Name = playerName;
+    player2Name = "Bot";
+    botDifficulty = selectedDifficulty;
+
+    const p1NameElem = document.getElementById("player1Name");
+    const p2NameElem = document.getElementById("player2Name");
+    if (p1NameElem) p1NameElem.textContent = player1Name;
+    if (p2NameElem) p2NameElem.textContent = botName;
+
+    if (modeModal) modeModal.style.display = "none";
+    if (gameScreen) gameScreen.style.display = "flex";
+    initializeGame();
+  });
+}
+
+// Welcome / theme
+if (startGameBtn) {
+  startGameBtn.addEventListener('click', () => {
+    playSound("soundClick");
+    if (welcomePopup) welcomePopup.style.display = 'none';
+    if (modeModal) modeModal.style.display = 'flex';
+  });
+}
+if (chooseThemeBtn) {
+  chooseThemeBtn.addEventListener('click', () => {
+    playSound("soundClick");
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+const toggleThemeBtn = document.getElementById('toggleTheme');
+if (toggleThemeBtn) {
+  toggleThemeBtn.addEventListener('click', () => {
+    playSound("soundClick");
+    document.body.classList.toggle('dark');
+    localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+  });
+}
+
+// Start PvP button
+if (startButton) {
+  startButton.addEventListener('click', () => {
+    playSound("soundClick");
+    player1Name = document.getElementById('player1').value || 'Player 1';
+    if (player2Name !== "Bot") {
+      player2Name = document.getElementById('player2').value || 'Player 2';
+    }
+    const p1NameElem = document.getElementById('player1Name');
+    const p2NameElem = document.getElementById('player2Name');
+    if (p1NameElem) p1NameElem.textContent = player1Name;
+    if (p2NameElem) p2NameElem.textContent = player2Name;
+    if (loginScreen) loginScreen.style.display = 'none';
+    if (gameScreen) gameScreen.style.display = 'flex';
+    initializeGame();
+  });
+}
+
+// Back button
+if (backButton) {
+  backButton.addEventListener('click', () => {
+    playSound("soundClick");
+    clearInterval(timerInterval);
+    resetBoardOnly();
+    if (gameScreen) gameScreen.style.display = 'none';
+    if (modeModal) modeModal.style.display = 'flex';
+    pauseBackgroundMusic();
+  });
+}
+
+// Restart & End Session listeners (only added once)
+if (restartButton) {
+  restartButton.addEventListener('click', () => {
+    playSound("soundClick");
+    restartGame();
+  });
+}
+if (endSessionButton) {
+  endSessionButton.addEventListener('click', () => {
+    playSound("soundClick");
+    endSession();
+  });
+}
+
+// ====== Main game functions ======
 
 function initializeGame() {
   board = ['', '', '', '', '', '', '', '', ''];
   gameActive = true;
   currentPlayer = 'X';
-  winningMessage.textContent = '';
-  document.getElementById('afterWinButtons').style.display = 'none';
+  if (winningMessage) winningMessage.textContent = '';
+  const afterWinElem = document.getElementById('afterWinButtons');
+  if (afterWinElem) afterWinElem.style.display = 'none';
 
   cells.forEach(cell => {
     cell.textContent = '';
     cell.classList.remove('winning', 'x', 'o');
+    // ensure single listener - remove then add with once:true
     cell.removeEventListener('click', handleCellClick);
     cell.addEventListener('click', handleCellClick, { once: true });
   });
 
-  restartButton.addEventListener('click', restartGame);
-  endSessionButton.addEventListener('click', endSession);
   updateDisplay();
   showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
-  document.getElementById('timerProgressBar').style.width = '100%';
+  const progress = document.getElementById('timerProgressBar');
+  if (progress) progress.style.width = '100%';
+
+  // start background music when game starts (try/catch for autoplay block)
+  startBackgroundMusic();
 }
 
 function handleCellClick(e) {
@@ -153,6 +300,10 @@ function handleCellClick(e) {
   board[cellIndex] = currentPlayer;
   cell.textContent = currentPlayer;
   cell.classList.add(currentPlayer.toLowerCase());
+
+  // sound when placing symbol
+  playSound("soundPlace");
+
   checkResult();
 }
 
@@ -171,32 +322,45 @@ function checkResult() {
     gameActive = false;
     clearInterval(timerInterval);
     const winner = currentPlayer === 'X' ? player1Name : player2Name;
-    winningMessage.textContent = `🎉 ${winner} Menang!`;
-    document.getElementById('afterWinButtons').style.display = 'flex';
+    if (winningMessage) winningMessage.textContent = `🎉 ${winner} Menang!`;
+    const afterWinElem = document.getElementById('afterWinButtons');
+    if (afterWinElem) afterWinElem.style.display = 'flex';
+
+    // play win sound
+    playSound("soundWin");
 
     if (currentPlayer === 'X') {
       player1Score++;
-      document.getElementById('player1Score').textContent = player1Score;
+      const el = document.getElementById('player1Score');
+      if (el) el.textContent = player1Score;
       player1WinStreak++; player2WinStreak = 0;
     } else {
       player2Score++;
-      document.getElementById('player2Score').textContent = player2Score;
+      const el = document.getElementById('player2Score');
+      if (el) el.textContent = player2Score;
       player2WinStreak++; player1WinStreak = 0;
     }
 
     winningCells.forEach(i => cells[i].classList.add('winning'));
     checkAchievements();
     showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
+    // keep background music playing (optional) - do not stop automatically on win
     return;
   }
 
   if (!board.includes('')) {
     gameActive = false;
     clearInterval(timerInterval);
-    winningMessage.textContent = '🤝 Permainan Seri!';
-    document.getElementById('afterWinButtons').style.display = 'flex';
+    if (winningMessage) winningMessage.textContent = '🤝 Permainan Seri!';
+    const afterWinElem = document.getElementById('afterWinButtons');
+    if (afterWinElem) afterWinElem.style.display = 'flex';
+
+    // play draw sound
+    playSound("soundDraw");
+
     draws++;
-    document.getElementById('draws').textContent = draws;
+    const drawEl = document.getElementById('draws');
+    if (drawEl) drawEl.textContent = draws;
     player1WinStreak = 0; player2WinStreak = 0;
     checkAchievements();
     showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
@@ -232,6 +396,10 @@ function botMove() {
   cells[index].textContent = currentPlayer;
   cells[index].classList.add(currentPlayer.toLowerCase());
   cells[index].removeEventListener('click', handleCellClick);
+
+  // bunyi pas bot taruh simbol
+  playSound("soundPlace");
+
   checkResult();
 }
 
@@ -297,9 +465,11 @@ function checkWinnerForMinimax(bd) {
 }
 
 function updateDisplay() {
-  currentPlayerDisplay.textContent = currentPlayer === 'X' ? player1Name : player2Name;
-  const indicator = currentPlayerDisplay.closest('.turn-indicator');
-  currentPlayer === 'X' ? indicator.classList.remove('o') : indicator.classList.add('o');
+  if (currentPlayerDisplay) currentPlayerDisplay.textContent = currentPlayer === 'X' ? player1Name : player2Name;
+  const indicator = currentPlayerDisplay ? currentPlayerDisplay.closest('.turn-indicator') : null;
+  if (indicator) {
+    if (currentPlayer === 'X') indicator.classList.remove('o'); else indicator.classList.add('o');
+  }
   startTurnTimer();
 }
 
@@ -312,31 +482,38 @@ const timerProgressBar = document.getElementById('timerProgressBar');
 function startTurnTimer() {
   clearInterval(timerInterval);
   let timeLeft = timerDuration;
-  timerCount.textContent = timeLeft;
-  timerProgressBar.style.width = '100%';
-  timerProgressBar.style.transition = `width ${timerDuration}s linear`;
-  void timerProgressBar.offsetWidth;
-  timerProgressBar.style.width = '0%';
+  if (timerCount) timerCount.textContent = timeLeft;
+  if (timerProgressBar) timerProgressBar.style.width = '100%';
+  if (timerProgressBar) timerProgressBar.style.transition = `width ${timerDuration}s linear`;
+  // force reflow for transition
+  if (timerProgressBar) void timerProgressBar.offsetWidth;
+  if (timerProgressBar) timerProgressBar.style.width = '0%';
+
   timerInterval = setInterval(() => {
     timeLeft--;
-    timerCount.textContent = timeLeft;
+    if (timerCount) timerCount.textContent = timeLeft;
     if (timeLeft <= 0) { clearInterval(timerInterval); handleTimeout(); }
   }, 1000);
 }
 
 function restartGame() {
+  // restart keeps scores, resets board
   initializeGame();
 }
 
 function endSession() {
   clearInterval(timerInterval);
   player1Score = 0; player2Score = 0; draws = 0;
-  document.getElementById('player1Score').textContent = 0;
-  document.getElementById('player2Score').textContent = 0;
-  document.getElementById('draws').textContent = 0;
+  const p1El = document.getElementById('player1Score');
+  const p2El = document.getElementById('player2Score');
+  const dEl = document.getElementById('draws');
+  if (p1El) p1El.textContent = 0;
+  if (p2El) p2El.textContent = 0;
+  if (dEl) dEl.textContent = 0;
   resetBoardOnly();
-  gameScreen.style.display = 'none';
-  modeModal.style.display = 'flex';
+  if (gameScreen) gameScreen.style.display = 'none';
+  if (modeModal) modeModal.style.display = 'flex';
+  pauseBackgroundMusic();
 }
 
 function handleTimeout() {
@@ -349,26 +526,20 @@ function handleTimeout() {
   }
 }
 
-// Back button
-const backButton = document.getElementById('backButton');
-backButton.addEventListener('click', () => {
-  clearInterval(timerInterval);
-  resetBoardOnly();
-  gameScreen.style.display = 'none';
-  modeModal.style.display = 'flex';
-});
-
 function resetBoardOnly() {
   board = ['', '', '', '', '', '', '', '', ''];
   gameActive = true; currentPlayer = 'X';
-  winningMessage.textContent = '';
-  document.getElementById('afterWinButtons').style.display = 'none';
+  if (winningMessage) winningMessage.textContent = '';
+  const afterWinElem = document.getElementById('afterWinButtons');
+  if (afterWinElem) afterWinElem.style.display = 'none';
   player1WinStreak = 0; player2WinStreak = 0;
   cells.forEach(c => { c.textContent = ''; c.classList.remove('winning','x','o'); });
 }
 
+// Achievements + UI helpers
 function showAchievement(score) {
   const list = document.getElementById('achievementList');
+  if (!list) return;
   list.innerHTML = `
     <li>${player1Name}: <strong class="score-value">${score.player1}</strong> poin</li>
     <li>${player2Name}: <strong class="score-value">${score.player2}</strong> poin</li>
@@ -391,7 +562,9 @@ function checkAchievements() {
 }
 
 function showAchievementNotification(msg) {
+  if (!achievementNotification) return;
   achievementNotification.textContent = `✨ ${msg}`;
   achievementNotification.classList.add('show');
   setTimeout(() => achievementNotification.classList.remove('show'), 3000);
 }
+
