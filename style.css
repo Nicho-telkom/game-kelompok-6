@@ -192,9 +192,9 @@ button {
 
 .theme-toggle-btn {
   width: 100%;
-  margin-top: 20px
-  ;
+  margin-top: 20px;
 }
+
 .bot-options {
   margin-top: 20px;
   display: none; /* tampil setelah pilih difficulty */
@@ -215,7 +215,6 @@ button {
 .bot-options input::placeholder {
   color: rgba(255,255,255,0.6);
 }
-
 
 /* Login Screen */
 .login-screen {
@@ -299,7 +298,6 @@ button {
   position: relative;        /* jangan absolute biar bisa center */
 }
 
-
 .game-screen h1 {
   font-family: 'Press Start 2P', cursive;
   font-size: 2.2rem;
@@ -342,7 +340,6 @@ button {
   width: fit-content;        /* Nggak full */
   min-width: 400px;          /* Biar nggak sempit */
 }
-
 
 /* Turn Indicator */
 .turn-indicator {
@@ -409,7 +406,6 @@ button {
   align-items: flex-start;
   gap: 40px;
 }
-
 
 /* Board */
 .board {
@@ -550,6 +546,21 @@ button {
   font-size: 1rem;
 }
 
+/* Tombol setelah menang */
+#afterWinButtons {
+  display: none; /* disembunyikan default */
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 15px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -596,8 +607,8 @@ button {
     font-size: 1.8rem;
   }
 
-  .login-box h1.title {
-    font-size: 2rem;
+    .login-box h1.title {
+    font-size: 1.8rem;
   }
 
   .board {
@@ -607,31 +618,26 @@ button {
   }
 
   .cell {
-    font-size: 2.2rem;
+    font-size: 2rem;
   }
 
-  .modal-content, .login-box {
-    padding: 25px;
+  .sidebar {
+    min-width: unset;
+    width: 100%;
   }
 
-  .winning-message {
-    font-size: 1.3rem;
+  .game-info-bar {
+    min-width: unset;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
   }
 
-/* Tombol setelah menang */
-#afterWinButtons {
-  display: none; /* disembunyikan default */
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  margin-top: 15px;
-  animation: fadeIn 0.5s ease-in-out;
+  .timer-progress-bar-container {
+    width: 80px;
+  }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
+.hidden {
+  display: none !important;
 }

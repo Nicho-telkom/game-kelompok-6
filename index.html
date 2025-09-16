@@ -22,13 +22,13 @@
   </div>
 
   <!-- Modal Pilihan Mode -->
-  <div id="modeModal" class="modal">
+  <div id="modeModal" class="modal hidden">
     <div class="modal-content">
       <h2>Pilih Mode Permainan</h2>
       <button id="playWithPlayer" class="mode-btn"><i class="fas fa-users"></i> Player vs Player</button>
       <button id="playWithBot" class="mode-btn"><i class="fas fa-robot"></i> Player vs Bot</button>
 
-      <div id="difficultyOptions" class="difficulty-options">
+      <div id="difficultyOptions" class="difficulty-options hidden">
         <label>Pilih Difficulty:</label>
         <div class="difficulty-buttons-group">
           <button class="difficulty-btn" data-difficulty="easy">🟢 Easy</button>
@@ -38,7 +38,7 @@
       </div>
 
       <!-- Bot Options -->
-      <div id="botOptions" class="bot-options">
+      <div id="botOptions" class="bot-options hidden">
         <div class="form-group">
           <label for="botPlayerName"><i class="fas fa-user"></i> Nama Kamu:</label>
           <input type="text" id="botPlayerName" placeholder="Masukkan nama kamu" value="Player">
@@ -51,7 +51,7 @@
   </div>
 
   <!-- Login Player vs Player -->
-  <div class="login-screen" id="loginScreen">
+  <div class="login-screen hidden" id="loginScreen"> <!-- tambahin hidden -->
     <div class="login-box">
       <h2>Player VS Player</h2>
       <h1 class="title">Tic Tac Toe</h1>
@@ -68,7 +68,7 @@
   </div>
 
   <!-- Halaman Game -->
-  <div class="game-screen" id="gameScreen">
+  <div class="game-screen hidden" id="gameScreen"> <!-- tambahin hidden -->
     <button id="backButton" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</button>
     <h1>Tic Tac Toe</h1>
 
