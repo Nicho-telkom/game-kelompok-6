@@ -101,11 +101,13 @@
         <!-- Sidebar -->
         <div class="sidebar">
           <div class="leaderboard card">
-            <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
-            <p><span id="player1Name">Player 1</span>: <strong class="score-value" id="player1Score">0</strong> Menang</p>
-            <p><span id="player2Name">Player 2</span>: <strong class="score-value" id="player2Score">0</strong> Menang</p>
-            <p>Seri: <strong class="score-value" id="draws">0</strong></p>
-          </div>
+            <ol id="leaderboardList">
+              <!-- Data leaderboard akan diisi otomatis dari JS -->
+              <h3><i class="fas fa-trophy"></i> Leaderboard</h3>
+              
+            </div>
+            <button id="resetLeaderboardBtn" class="reset-btn">🔄 Reset Leaderboard</button>
+          </ol>
 
           <div id="achievementBox" class="achievement-box card">
             <h3><i class="fas fa-star"></i> Achievement</h3>

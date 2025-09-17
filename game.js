@@ -44,6 +44,7 @@ window.onload = () => {
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark');
   }
+  renderLeaderboard();
 };
 
 // ===== Achievements / State =====
@@ -238,7 +239,55 @@ if (startButton) {
     initializeGame();
   });
 }
+// Ambil leaderboard dari localStorage atau buat baru
+function loadLeaderboard() {
+  return JSON.parse(localStorage.getItem("leaderboard")) || {};
+}
 
+// Simpan leaderboard ke localStorage
+function saveLeaderboard(lb) {
+  localStorage.setItem("leaderboard", JSON.stringify(lb));
+}
+
+// Tambahkan kemenangan untuk pemain tertentu
+function addWinToLeaderboard(playerName) {
+  let lb = loadLeaderboard();
+  if (!lb[playerName]) lb[playerName] = 0;
+  lb[playerName]++;
+  saveLeaderboard(lb);
+  renderLeaderboard();
+}
+
+// Tampilkan leaderboard ke halaman
+function renderLeaderboard() {
+  let lb = loadLeaderboard();
+  let sorted = Object.entries(lb).sort((a, b) => b[1] - a[1]); // urut dari skor tertinggi
+  let container = document.getElementById("leaderboardList");
+  if (!container) return;
+
+  container.innerHTML = sorted
+    .map(([name, wins], idx) => `
+      <li>
+        <span>${idx + 1}. ${name}</span>
+        <span>${wins} 🏆</span>
+      </li>
+    `)
+    .join('');
+}
+function resetLeaderboard() {
+  localStorage.removeItem("leaderboard");
+  renderLeaderboard();
+}
+
+// Event listener untuk tombol reset
+const resetLeaderboardBtn = document.getElementById("resetLeaderboardBtn");
+if (resetLeaderboardBtn) {
+  resetLeaderboardBtn.addEventListener("click", () => {
+    if (confirm("Yakin ingin mereset leaderboard?")) {
+      resetLeaderboard();
+    }
+  });
+}
 // Back button
 if (backButton) {
   backButton.addEventListener('click', () => {
@@ -345,6 +394,8 @@ function checkResult() {
     checkAchievements();
     showAchievement({ player1: player1Score, player2: player2Score, seri: draws });
     // keep background music playing (optional) - do not stop automatically on win
+    // ✅ Tambah ke leaderboard global
+addWinToLeaderboard(winner);
     return;
   }
 

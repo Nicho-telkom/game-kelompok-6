@@ -26,7 +26,9 @@ body.dark .modal,
 body.dark .modal-content,
 body.dark .login-box,
 body.dark .game-box,
-body.dark .card {
+body.dark .card,
+body.dark .welcome-popup,
+body.dark .welcome-card {
   background: rgba(20, 20, 35, 0.8);
   color: #ddd;
 }
@@ -285,6 +287,79 @@ button {
   width: 100%;
   padding: 12px;
   font-size: 1.1rem;
+}
+.leaderboard {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 20px;
+}
+
+.leaderboard h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #ffcc00;
+}
+
+.leaderboard ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard li {
+  background: rgba(0,0,0,0.05);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+}
+
+.leaderboard li:nth-child(1) {
+  background: gold;
+  color: black;
+}
+
+.leaderboard li:nth-child(2) {
+  background: silver;
+  color: black;
+}
+
+.leaderboard li:nth-child(3) {
+  background: #cd7f32; /* perunggu */
+  color: white;
+}.leaderboard {
+  padding: 15px;
+  border-radius: 12px;
+  background: #fff3cd;
+  color: #333;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.leaderboard ol {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+
+.leaderboard li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.reset-btn {
+  background: linear-gradient(90deg, #ff6a00, #ee0979);;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .game-screen {
